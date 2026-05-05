@@ -148,6 +148,7 @@ const gameAudio = {
     powerTrack: null,
     normalHasStarted: false,
     normalTrackPrimed: false,
+    powerTrackUnlocked: false,
 
     ensure() {
         if (!this.normalTrack) {
@@ -192,6 +193,41 @@ const gameAudio = {
     resume() {
         this.ensure();
         if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+    },
+
+    unlockPowerTrack() {
+        this.ensure();
+        if (!this.powerTrack || this.powerTrackUnlocked) return;
+
+        const originalMuted = this.powerTrack.muted;
+        this.powerTrack.muted = true;
+
+        try {
+            this.powerTrack.currentTime = POWER_MUSIC_START_OFFSET;
+        } catch (error) {
+            console.warn('Unable to prime power music offset', error);
+        }
+
+        const finishUnlock = () => {
+            this.powerTrack.pause();
+            try {
+                this.powerTrack.currentTime = POWER_MUSIC_START_OFFSET;
+            } catch (error) {
+                console.warn('Unable to reset primed power music offset', error);
+            }
+            this.powerTrack.muted = originalMuted;
+            this.powerTrackUnlocked = true;
+        };
+
+        const playPromise = this.powerTrack.play();
+        if (playPromise && typeof playPromise.then === 'function') {
+            playPromise.then(finishUnlock).catch((error) => {
+                this.powerTrack.muted = originalMuted;
+                console.warn('Power music unlock was blocked', error);
+            });
+        } else {
+            finishUnlock();
+        }
     },
 
     play(name) {
@@ -1970,6 +2006,7 @@ canvas.addEventListener('touchend', e => {
 }, { passive: false });
 
 startBtn.addEventListener('click', () => {
+    gameAudio.unlockPowerTrack();
     gameAudio.play('normal');
 
     const introChar = document.getElementById('intro-character');
