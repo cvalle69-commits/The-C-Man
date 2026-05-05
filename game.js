@@ -2013,6 +2013,7 @@ let touchStartX = 0;
 let touchStartY = 0;
 let touchActive = false;
 let touchLockedAxis = null;
+let activeTouchId = null;
 const SWIPE_THRESHOLD = 22;
 const SWIPE_AXIS_LOCK_RATIO = 1.08;
 
@@ -2043,21 +2044,30 @@ function handleSwipeDirection(deltaX, deltaY) {
 }
 
 function readTouchPoint(e) {
-    const touch = e.changedTouches && e.changedTouches[0];
-    return touch ? { x: touch.clientX, y: touch.clientY } : null;
+    const lists = [e.changedTouches, e.touches];
+    for (const list of lists) {
+        if (!list) continue;
+        for (const touch of list) {
+            if (activeTouchId === null || touch.identifier === activeTouchId) {
+                return { x: touch.clientX, y: touch.clientY, id: touch.identifier };
+            }
+        }
+    }
+    return null;
 }
 
-canvas.addEventListener('touchstart', e => {
-    const point = readTouchPoint(e);
-    if (!point) return;
-    touchStartX = point.x;
-    touchStartY = point.y;
+function onTouchStart(e) {
+    const touch = e.changedTouches && e.changedTouches[0];
+    if (!touch) return;
+    activeTouchId = touch.identifier;
+    touchStartX = touch.clientX;
+    touchStartY = touch.clientY;
     touchActive = true;
     touchLockedAxis = null;
     e.preventDefault();
-}, { passive: false });
+}
 
-canvas.addEventListener('touchmove', e => {
+function onTouchMove(e) {
     if (!touchActive) return;
     const point = readTouchPoint(e);
     if (!point) return;
@@ -2066,16 +2076,29 @@ canvas.addEventListener('touchmove', e => {
         touchStartY = point.y;
     }
     e.preventDefault();
-}, { passive: false });
+}
 
-canvas.addEventListener('touchend', e => {
+function onTouchEnd(e) {
     if (!touchActive) return;
     const point = readTouchPoint(e);
     if (point) handleSwipeDirection(point.x - touchStartX, point.y - touchStartY);
     touchActive = false;
     touchLockedAxis = null;
+    activeTouchId = null;
     e.preventDefault();
-}, { passive: false });
+}
+
+function onTouchCancel(e) {
+    touchActive = false;
+    touchLockedAxis = null;
+    activeTouchId = null;
+    e.preventDefault();
+}
+
+gameFrame.addEventListener('touchstart', onTouchStart, { passive: false });
+gameFrame.addEventListener('touchmove', onTouchMove, { passive: false });
+gameFrame.addEventListener('touchend', onTouchEnd, { passive: false });
+gameFrame.addEventListener('touchcancel', onTouchCancel, { passive: false });
 
 startBtn.addEventListener('click', () => {
     gameAudio.unlockPowerTrack();
