@@ -135,6 +135,7 @@ const HEAD_CROP = {
 };
 
 const NORMAL_MUSIC_START_OFFSET = 3.5;
+const POWER_MUSIC_START_OFFSET = 18;
 
 const gameAudio = {
     ctx: null,
@@ -212,7 +213,7 @@ const gameAudio = {
         if (name === 'power') {
             if (!this.powerTrack) return;
             try {
-                this.powerTrack.currentTime = 0;
+                this.powerTrack.currentTime = POWER_MUSIC_START_OFFSET;
             } catch (error) {
                 console.warn('Unable to restart power music', error);
             }
