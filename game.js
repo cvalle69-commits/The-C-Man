@@ -1695,7 +1695,7 @@ function checkCollisions() {
                 }
                 const pts = 200 * eatMultiplier;
                 addScore(pts);
-                eatMultiplier *= 2; // 200 → 400 → 800 → 1600
+                eatMultiplier *= 2; // 200 -> 400 -> 800 -> 1600
                 // Floating score popup
                 scorePopups.push({ x: ghost.x, y: ghost.y, text: '+' + pts, life: 60 });
                 updateHUD();
@@ -2056,7 +2056,13 @@ function readTouchPoint(e) {
     return null;
 }
 
+function shouldIgnoreGameplayTouch(e) {
+    return !gameStarted ||
+        !!(e.target && e.target.closest('button, #start-screen, #overlay, .overlay-content'));
+}
+
 function onTouchStart(e) {
+    if (shouldIgnoreGameplayTouch(e)) return;
     const touch = e.changedTouches && e.changedTouches[0];
     if (!touch) return;
     activeTouchId = touch.identifier;
@@ -2089,6 +2095,7 @@ function onTouchEnd(e) {
 }
 
 function onTouchCancel(e) {
+    if (!touchActive) return;
     touchActive = false;
     touchLockedAxis = null;
     activeTouchId = null;
@@ -2140,3 +2147,4 @@ restartBtn.addEventListener('click', () => {
 });
 
 init();
+
