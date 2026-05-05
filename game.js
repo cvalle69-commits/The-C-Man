@@ -2013,9 +2013,8 @@ let touchStartX = 0;
 let touchStartY = 0;
 let touchActive = false;
 let touchLockedAxis = null;
-const SWIPE_THRESHOLD = 28;
-const SWIPE_AXIS_LOCK_RATIO = 1.28;
-const SWIPE_AXIS_SWITCH_THRESHOLD = 34;
+const SWIPE_THRESHOLD = 22;
+const SWIPE_AXIS_LOCK_RATIO = 1.08;
 
 function handleSwipeDirection(deltaX, deltaY) {
     const absX = Math.abs(deltaX);
@@ -2037,8 +2036,6 @@ function handleSwipeDirection(deltaX, deltaY) {
 
     const currentNext = player ? player.nextDir : { x: 0, y: 0 };
     if (currentNext.x === dir.x && currentNext.y === dir.y) return true;
-
-    if (touchLockedAxis && touchLockedAxis !== axis && Math.max(absX, absY) < SWIPE_AXIS_SWITCH_THRESHOLD) return false;
 
     queuePlayerDirection(dir);
     touchLockedAxis = axis;
