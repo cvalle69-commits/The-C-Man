@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE C-MAN | Neon Retro Pac-Man</title>
+    <meta name="theme-color" content="#050008">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="THE C-MAN">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Chroma Key Filter to remove white backgrounds from headshots -->
+    <svg style="position: absolute; width: 0; height: 0; pointer-events: none;">
+      <filter id="chroma-white" color-interpolation-filters="sRGB">
+        <feColorMatrix type="matrix" values="
+          1 0 0 0 0
+          0 1 0 0 0
+          0 0 1 0 0
+          -10 -10 -10 1 28
+        "/>
+      </filter>
+    </svg>
+
+    <div id="game-container" class="title-screen-active">
+        <header>
+            <div class="stat-box">
+                <span class="label">SCORE</span>
+                <span id="score-value">0000</span>
+            </div>
+            <div class="logo-group">
+                <div class="logo">THE C-MAN</div>
+                <div class="level-badge">LVL <span id="level-value">1</span></div>
+            </div>
+            <div class="stat-box">
+                <span class="label">LIVES</span>
+                <div id="lives-container">
+                    <div class="life-dot"></div>
+                    <div class="life-dot"></div>
+                    <div class="life-dot"></div>
+                </div>
+            </div>
+        </header>
+
+        <main id="game-frame" class="start-frame">
+            <canvas id="gameCanvas"></canvas>
+            
+            <div id="overlay" class="hidden">
+                <div class="overlay-content glass">
+                    <h1 id="overlay-title">GAME OVER</h1>
+                    <p id="overlay-msg">You were caught!</p>
+                    <button id="restart-btn">PLAY AGAIN</button>
+                </div>
+            </div>
+
+            <div id="start-screen">
+                <div class="start-grid" aria-hidden="true"></div>
+                <div class="start-vignette" aria-hidden="true"></div>
+
+                <div class="start-inner">
+                    <div class="start-title-group">
+                        <h1 class="start-title">THE C-MAN</h1>
+                        <div class="start-subtitle">EAT DOTS. DODGE CONSEQUENCES.</div>
+                    </div>
+
+                    <div class="start-stage">
+                        <div class="enemy-shadow enemy-shadow-left"><span class="torch" aria-hidden="true"></span></div>
+                        <div id="intro-character">
+                            <div class="intro-flame" aria-hidden="true"></div>
+                            <img src="head.png" alt="THE C-MAN" id="intro-img">
+                        </div>
+                        <div class="enemy-shadow enemy-shadow-right"><span class="torch" aria-hidden="true"></span></div>
+                    </div>
+
+                    <div class="bonus-strip" aria-label="Bonus icons">
+                        <span class="bonus-icon bonus-cigarette"></span>
+                        <span class="bonus-icon bonus-beer"></span>
+                        <span class="bonus-icon bonus-leaf"></span>
+                        <span class="bonus-icon bonus-bag"></span>
+                    </div>
+
+                    <div class="overlay-content glass start-panel">
+                        <button id="start-btn">PRESS START</button>
+                        <p class="control-hint">ARROWS / WASD TO MOVE</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+    </div>
+
+    <script src="maze.js"></script>
+    <script src="game.js"></script>
+    <script>
+        if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js').catch(console.warn);
+            });
+        }
+    </script>
+</body>
+</html>
