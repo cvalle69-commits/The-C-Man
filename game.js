@@ -1507,6 +1507,73 @@ function buildMazeCache() {
     mazeCacheDirty = false;
 }
 
+
+function drawPowerWallFlames() {
+    if (frightenedTimer <= 0 || !TILE_DIM) return;
+
+    const time = performance.now() * 0.006;
+    const pulse = 0.72 + Math.sin(time * 2.1) * 0.18;
+    const flicker = 0.82 + Math.sin(time * 5.3) * 0.16;
+    const flameHeight = TILE_DIM * (0.58 + pulse * 0.22);
+
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+
+    for (let y = 0; y < MAP_HEIGHT; y++) {
+        for (let x = 0; x < MAP_WIDTH; x++) {
+            if (MAZE_LAYOUT[y][x] !== 1) continue;
+
+            const px = x * TILE_DIM;
+            const py = y * TILE_DIM;
+            const seed = Math.sin((x * 17.13 + y * 31.91) + time * 1.7);
+            const localPulse = 0.78 + seed * 0.16;
+            const cx = px + TILE_DIM * 0.5;
+            const baseY = py + TILE_DIM * 0.86;
+
+            ctx.globalAlpha = 0.2 + pulse * 0.18;
+            ctx.shadowBlur = TILE_DIM * 0.5;
+            ctx.shadowColor = '#ff3d00';
+            ctx.fillStyle = '#ff3d00';
+            ctx.fillRect(px + TILE_DIM * 0.16, py + TILE_DIM * 0.14, TILE_DIM * 0.68, TILE_DIM * 0.72);
+
+            ctx.globalAlpha = 0.72 * flicker;
+            const gradient = ctx.createLinearGradient(cx, py, cx, baseY);
+            gradient.addColorStop(0, 'rgba(255, 246, 118, 0.98)');
+            gradient.addColorStop(0.38, 'rgba(255, 138, 0, 0.92)');
+            gradient.addColorStop(0.78, 'rgba(255, 32, 0, 0.78)');
+            gradient.addColorStop(1, 'rgba(188, 19, 254, 0.18)');
+            ctx.fillStyle = gradient;
+            ctx.shadowBlur = TILE_DIM * 0.8;
+            ctx.shadowColor = '#ff8a00';
+            ctx.beginPath();
+            ctx.moveTo(px + TILE_DIM * 0.12, baseY);
+            ctx.quadraticCurveTo(px + TILE_DIM * 0.22, py + TILE_DIM * (0.48 + seed * 0.06), px + TILE_DIM * 0.34, baseY - flameHeight * 0.68 * localPulse);
+            ctx.quadraticCurveTo(px + TILE_DIM * 0.44, py + TILE_DIM * (0.32 - seed * 0.05), cx, baseY - flameHeight * localPulse);
+            ctx.quadraticCurveTo(px + TILE_DIM * 0.58, py + TILE_DIM * (0.46 + seed * 0.04), px + TILE_DIM * 0.68, baseY - flameHeight * 0.62);
+            ctx.quadraticCurveTo(px + TILE_DIM * 0.84, py + TILE_DIM * 0.56, px + TILE_DIM * 0.88, baseY);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.globalAlpha = 0.9;
+            ctx.shadowBlur = TILE_DIM * 0.28;
+            ctx.shadowColor = '#fff27a';
+            ctx.fillStyle = 'rgba(255, 245, 130, 0.86)';
+            ctx.beginPath();
+            ctx.moveTo(cx, baseY - TILE_DIM * 0.1);
+            ctx.quadraticCurveTo(cx - TILE_DIM * 0.12, py + TILE_DIM * 0.52, cx, baseY - flameHeight * 0.52 * localPulse);
+            ctx.quadraticCurveTo(cx + TILE_DIM * 0.12, py + TILE_DIM * 0.56, cx + TILE_DIM * 0.08, baseY - TILE_DIM * 0.08);
+            ctx.closePath();
+            ctx.fill();
+        }
+    }
+
+    ctx.globalAlpha = 1;
+    ctx.shadowBlur = 0;
+    ctx.restore();
+}
+
 function drawPellets() {
     const theme = currentTheme();
 
@@ -1539,6 +1606,7 @@ function drawMaze() {
         buildMazeCache();
     }
     ctx.drawImage(mazeCanvas, 0, 0);
+    drawPowerWallFlames();
     drawPellets();
 }
 
