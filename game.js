@@ -144,6 +144,7 @@ const gameAudio = {
     step: 0,
     intervalId: null,
     normalTrack: null,
+    powerTrack: null,
     normalHasStarted: false,
     normalTrackPrimed: false,
 
@@ -155,6 +156,14 @@ const gameAudio = {
             this.normalTrack.preload = 'auto';
             this.normalTrack.addEventListener('loadedmetadata', () => this.primeNormalTrack(), { once: true });
             this.normalTrack.load();
+        }
+
+        if (!this.powerTrack) {
+            this.powerTrack = new Audio('audio/du-hast.mp3');
+            this.powerTrack.loop = true;
+            this.powerTrack.volume = 0.48;
+            this.powerTrack.preload = 'auto';
+            this.powerTrack.load();
         }
 
         this.primeNormalTrack();
@@ -200,10 +209,15 @@ const gameAudio = {
             return;
         }
 
-        this.activeLoop = POWER_MUSIC_PATTERN;
-        this.step = 0;
-        this.intervalId = setInterval(() => this.playStep(), this.activeLoop.interval);
-        this.playStep();
+        if (name === 'power') {
+            if (!this.powerTrack) return;
+            try {
+                this.powerTrack.currentTime = 0;
+            } catch (error) {
+                console.warn('Unable to restart power music', error);
+            }
+            this.powerTrack.play().catch(() => {});
+        }
     },
 
     stop(name = null) {
@@ -214,6 +228,10 @@ const gameAudio = {
 
         if (!name || name === 'normal' || this.activeName === 'normal') {
             if (this.normalTrack) this.normalTrack.pause();
+        }
+
+        if (!name || name === 'power' || this.activeName === 'power') {
+            if (this.powerTrack) this.powerTrack.pause();
         }
 
         this.activeName = null;

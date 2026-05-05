@@ -1,4 +1,4 @@
-const CACHE_NAME = 'the-c-man-v3';
+const CACHE_NAME = 'the-c-man-v4';
 const APP_SHELL = [
   './',
   './index.html',
@@ -10,7 +10,8 @@ const APP_SHELL = [
   './manifest.json',
   './icons/icon-192.png',
   './icons/icon-512.png',
-  './audio/pacmansmusic.mp3'
+  './audio/pacmansmusic.mp3',
+  './audio/du-hast.mp3'
 ];
 
 self.addEventListener('install', (event) => {
