@@ -2102,10 +2102,10 @@ function onTouchCancel(e) {
     e.preventDefault();
 }
 
-gameFrame.addEventListener('touchstart', onTouchStart, { passive: false });
-gameFrame.addEventListener('touchmove', onTouchMove, { passive: false });
-gameFrame.addEventListener('touchend', onTouchEnd, { passive: false });
-gameFrame.addEventListener('touchcancel', onTouchCancel, { passive: false });
+window.addEventListener('touchstart', onTouchStart, { passive: false, capture: true });
+window.addEventListener('touchmove', onTouchMove, { passive: false, capture: true });
+window.addEventListener('touchend', onTouchEnd, { passive: false, capture: true });
+window.addEventListener('touchcancel', onTouchCancel, { passive: false, capture: true });
 
 startBtn.addEventListener('click', () => {
     gameAudio.unlockPowerTrack();
