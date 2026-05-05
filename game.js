@@ -2012,16 +2012,36 @@ window.addEventListener('keydown', e => {
 let touchStartX = 0;
 let touchStartY = 0;
 let touchActive = false;
-const SWIPE_THRESHOLD = 24;
+let touchLockedAxis = null;
+const SWIPE_THRESHOLD = 28;
+const SWIPE_AXIS_LOCK_RATIO = 1.28;
+const SWIPE_AXIS_SWITCH_THRESHOLD = 34;
 
 function handleSwipeDirection(deltaX, deltaY) {
-    if (Math.max(Math.abs(deltaX), Math.abs(deltaY)) < SWIPE_THRESHOLD) return false;
+    const absX = Math.abs(deltaX);
+    const absY = Math.abs(deltaY);
+    if (Math.max(absX, absY) < SWIPE_THRESHOLD) return false;
 
-    if (Math.abs(deltaX) > Math.abs(deltaY)) {
-        queuePlayerDirection({ x: deltaX > 0 ? 1 : -1, y: 0 });
+    let dir = null;
+    let axis = null;
+
+    if (absX >= absY * SWIPE_AXIS_LOCK_RATIO) {
+        axis = 'x';
+        dir = { x: deltaX > 0 ? 1 : -1, y: 0 };
+    } else if (absY >= absX * SWIPE_AXIS_LOCK_RATIO) {
+        axis = 'y';
+        dir = { x: 0, y: deltaY > 0 ? 1 : -1 };
     } else {
-        queuePlayerDirection({ x: 0, y: deltaY > 0 ? 1 : -1 });
+        return false;
     }
+
+    const currentNext = player ? player.nextDir : { x: 0, y: 0 };
+    if (currentNext.x === dir.x && currentNext.y === dir.y) return true;
+
+    if (touchLockedAxis && touchLockedAxis !== axis && Math.max(absX, absY) < SWIPE_AXIS_SWITCH_THRESHOLD) return false;
+
+    queuePlayerDirection(dir);
+    touchLockedAxis = axis;
     return true;
 }
 
@@ -2036,6 +2056,7 @@ canvas.addEventListener('touchstart', e => {
     touchStartX = point.x;
     touchStartY = point.y;
     touchActive = true;
+    touchLockedAxis = null;
     e.preventDefault();
 }, { passive: false });
 
@@ -2055,6 +2076,7 @@ canvas.addEventListener('touchend', e => {
     const point = readTouchPoint(e);
     if (point) handleSwipeDirection(point.x - touchStartX, point.y - touchStartY);
     touchActive = false;
+    touchLockedAxis = null;
     e.preventDefault();
 }, { passive: false });
 
