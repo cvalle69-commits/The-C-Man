@@ -1,4 +1,4 @@
-const CACHE_NAME = 'the-c-man-v7';
+const CACHE_NAME = 'the-c-man-v8';
 const APP_SHELL = [
   './',
   './index.html',
