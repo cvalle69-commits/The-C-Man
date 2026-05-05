@@ -1,4 +1,4 @@
-const CACHE_NAME = 'the-c-man-v2';
+const CACHE_NAME = 'the-c-man-v3';
 const APP_SHELL = [
   './',
   './index.html',
@@ -6,6 +6,7 @@ const APP_SHELL = [
   './maze.js',
   './game.js',
   './head.png',
+  './head-transparent.png',
   './manifest.json',
   './icons/icon-192.png',
   './icons/icon-512.png',

@@ -88,7 +88,7 @@ let bonusItem = null;
 let player;
 let ghosts = [];
 const headImg = new Image();
-headImg.src = 'head.png';
+headImg.src = 'head-transparent.png';
 
 const GHOST_STATE = {
     CHASE: 'CHASE',
@@ -118,7 +118,7 @@ let ghostHouse = {
     exit: { x: 0, y: 0 }
 };
 
-// Offscreen canvas for applying the chroma-key filter to the head only
+// Offscreen canvas for drawing the transparent head asset
 const headCanvas = document.createElement('canvas');
 const headCtx = headCanvas.getContext('2d');
 
@@ -842,14 +842,12 @@ class Player extends Entity {
             const srcW = headImg.naturalWidth * HEAD_CROP.width;
             const srcH = headImg.naturalHeight * HEAD_CROP.height;
             
-            // Draw cropped head onto offscreen canvas with chroma-key filter
+            // Draw cropped transparent head onto offscreen canvas.
             const drawSize = Math.ceil(size);
             headCanvas.width = drawSize;
             headCanvas.height = drawSize;
             headCtx.clearRect(0, 0, drawSize, drawSize);
-            headCtx.filter = 'url(#chroma-white)';
             headCtx.drawImage(headImg, srcX, srcY, srcW, srcH, 0, 0, drawSize, drawSize);
-            headCtx.filter = 'none';
             
             // Blit the filtered result onto the main canvas
             ctx.drawImage(headCanvas, -size/2, -size/2, size, size);
@@ -1783,9 +1781,7 @@ function drawDeathAnimation() {
             headCanvas.width = drawSize;
             headCanvas.height = drawSize;
             headCtx.clearRect(0, 0, drawSize, drawSize);
-            headCtx.filter = 'url(#chroma-white)';
             headCtx.drawImage(headImg, srcX, srcY, srcW, srcH, 0, 0, drawSize, drawSize);
-            headCtx.filter = 'none';
             ctx.drawImage(headCanvas, -size/2, -size/2, size, size);
         }
     }
